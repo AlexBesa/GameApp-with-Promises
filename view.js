@@ -1,9 +1,3 @@
-getGamesList(function(arrayOfGames){
-    for(var i = 0; i < arrayOfGames.length; i++) {
-        createDomElement(arrayOfGames[i]);
-    }
-});
-
 function createDomElement(gameObj){
     var container1 = document.querySelector('.container');
     const gameELement = document.createElement("div");
@@ -12,18 +6,15 @@ function createDomElement(gameObj){
                         <img src="${gameObj.imageUrl}" />
                         <p>${gameObj.description}</p> 
                         <button class="delete-btn">Delete Game</button>
-                        <button class="update-btn">Edit Game</button></div>`;    
+                        <button class="edit-btn">Edit Game</button></div>`;    
     container1.appendChild(gameELement);
 
     const gameObjectId = document.getElementById(`${gameObj._id}`);
-    gameObjectId.addEventListener("click", function(event){
+    gameObjectId.addEventListener("click", event =>{
         if(event.target.classList.contains("delete-btn")){
-            // console.log("event.target.getAttribute('id')",event.target.parentElement.getAttribute("id"));
-            deleteGame(event.target.parentElement.getAttribute("id"), function(apiResponse){
-                console.log("api response is here: ",apiResponse);
-                removeDeletedElementFromDOM(event.target.parentElement);
-            })
-        }else if(event.target.classList.contains("update-btn")){           
+            deleteGame(event.target.parentElement.getAttribute("id"));          
+            removeDeletedElementFromDOM(event.target.parentElement);          
+        }else if(event.target.classList.contains("edit-btn")){           
             createUpdateDivElement( gameObj, event.target.parentElement);        
         }
     });
@@ -51,32 +42,26 @@ function createUpdateDivElement(updateGameObj, gameContainer){
     console.log('updated game object is: ', updateGameObj);
     
     const updateGameObjectId = document.getElementById(`${updateGameObj._id}`);
-    updateGameObjectId.addEventListener("click", function(event){
+    updateGameObjectId.addEventListener("click", event => {
         if(event.target.classList.contains("cancelBtn")){
-            // console.log("eventul sters este:",event.target.parentNode);
             removeDeletedElementFromDOM(event.target.parentElement); 
         }else if (event.target.classList.contains("updateBtn")){        
-            // console.log("updateGameObj este aici",updateGameObj);
-            gameContainer.classList.add('grayed-out');
             const updateGameTitleInputValue = updateElement.querySelector('#updateGameTitle').value;
-            // console.log("updateGameTitleInputValue is :",updateGameTitleInputValue);
             const updateGameDescriptionInputValue = updateElement.querySelector('#updateGameDescription').value;
             const updateGameImageUrlInputValue = updateElement.querySelector('#updateGameImageUrl').value;
             
-            gameContainer.querySelector('img').src = updateGameImageUrlInputValue;
             gameContainer.querySelector('h1').innerHTML = updateGameTitleInputValue;
             gameContainer.querySelector('p').innerHTML = updateGameDescriptionInputValue;
-            
-            updateGameObj.title=updateGameTitleInputValue;
-            updateGameObj.imageUrl=updateGameImageUrlInputValue;
-            updateGameObj.description=updateGameDescriptionInputValue;
-            
-            updateGameRequest(updateGameObj, function() { console.log("Status update: Success !!! ")}, gameContainer)
+            gameContainer.querySelector('img').src = updateGameImageUrlInputValue;
 
+            updateGameObj.title=updateGameTitleInputValue;
+            updateGameObj.description=updateGameDescriptionInputValue;
+            updateGameObj.imageUrl=updateGameImageUrlInputValue;
+            
+            updateGameRequest(updateGameObj);
             removeDeletedElementFromDOM(event.target.parentElement);
         }    
     });
-  
 }      
   
 function removeDeletedElementFromDOM(domElement){
@@ -112,7 +97,7 @@ function buildErrorMessage(inputEl, errosMsg){
     inputEl.before(errorMsgElement);
 }
 
-document.querySelector(".submitBtn").addEventListener("click", function(event){
+document.querySelector(".submitBtn").addEventListener("click", event => {
     event.preventDefault();
 
     const gameTitle = document.getElementById("gameTitle");
@@ -139,10 +124,7 @@ document.querySelector(".submitBtn").addEventListener("click", function(event){
         urlencoded.append("description", gameDescription.value);
         console.log("aici e urlencoded ", urlencoded)
 
-        createGameRequest(urlencoded, createDomElement);
-
-        console.log("aici e createGameRequest ", createGameRequest)
-        
+        createGameRequest(urlencoded);
     }
     gameTitle.value = "";
     gameDescription.value = "";
